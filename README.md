@@ -1,4 +1,4 @@
-
+ 
 <img width="1536" height="1024" alt="ChatGPT Image Apr 13, 2026, 08_28_37 AM" src="https://github.com/user-attachments/assets/8f5ec637-4b00-4020-b0a1-17740f754361" />
 
 Wanderlust is designed using a Monolithic MVC Architecture built on the MERN Stack, with clear separation between Controllers, Business Logic, and Data Layer. The system is optimized for performance and scalability using a Cache-First Strategy with Redis and enhanced search capabilities through Semantic Search with Vector Embeddings in MongoDB Atlas.
@@ -10,7 +10,7 @@ Preview:
 
 
 LIVE DEMO:
-https://wanderlust-98lu.onrender.com/listings
+https://wanderlust-98lu.onrender.com
 
 ## Primary Architectural Components
 
