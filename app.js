@@ -2,7 +2,6 @@ if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
 }
 
-
 if (!process.env.MONGO_URI) throw new Error("MONGO_URI env var not set!");
 if (!process.env.SESSION_SECRET) throw new Error("SESSION_SECRET env var not set!");
 
@@ -16,13 +15,13 @@ const flash = require("connect-flash");
 const MongoStore = require("connect-mongo").default;
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
-const helmet = require("helmet"); 
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
 
 const ExpressError = require("./utils/ExpressError");
 const User = require("./models/user");
 
 const app = express();
-
 
 app.use(
   helmet({
@@ -34,7 +33,7 @@ app.use(
           "https://cdn.jsdelivr.net",
           "https://api.mapbox.com",
           "https://cdnjs.cloudflare.com",
-          "'unsafe-inline'", // needed for Bootstrap & inline scripts
+          "'unsafe-inline'",
         ],
         styleSrc: [
           "'self'",
@@ -62,6 +61,25 @@ app.use(
     },
   })
 );
+
+// ================= RATE LIMITING =================
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: "Too many requests, please try again after 15 minutes.",
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: "Too many login attempts, please try again after 15 minutes.",
+});
+
+app.use(limiter);
+app.use("/login", authLimiter);   // ← THIS WAS MISSING
+app.use("/signup", authLimiter);  // ← THIS WAS MISSING
 
 // ================= DB CONNECT =================
 const dbUrl = process.env.MONGO_URI;
@@ -92,19 +110,19 @@ const store = MongoStore.create({
 });
 
 store.on("error", (err) => {
-  console.error("Session store error:", err); 
+  console.error("Session store error:", err);
 });
 
 app.use(
   session({
     store,
-    secret: process.env.SESSION_SECRET, 
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // ✅ HTTPS only in prod
-      sameSite: "strict",                           
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
       maxAge: 1000 * 60 * 60 * 24 * 7,
     },
   })
@@ -126,7 +144,7 @@ app.use((req, res, next) => {
   res.locals.success = req.flash("success") || [];
   res.locals.error = req.flash("error") || [];
   res.locals.query = req.query?.query || "";
-  res.locals.category = req.query?.category || ""; 
+  res.locals.category = req.query?.category || "";
   next();
 });
 
@@ -147,12 +165,10 @@ app.use("/", userRoutes);
 app.use("/ai", aiRoutes);
 app.use("/search", searchRoutes);
 
-// 
 app.use((req, res, next) => {
   next(new ExpressError(404, "Page Not Found"));
 });
 
-//  
 app.use((err, req, res, next) => {
   console.error("ERROR:", err.message);
   console.error(err.stack);
