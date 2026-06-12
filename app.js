@@ -16,14 +16,14 @@ const flash = require("connect-flash");
 const MongoStore = require("connect-mongo").default;
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
-const helmet = require("helmet"); // ✅ ADD THIS
+const helmet = require("helmet"); 
 
 const ExpressError = require("./utils/ExpressError");
 const User = require("./models/user");
 
 const app = express();
 
-// ✅ HELMET — security headers (add before everything else)
+
 app.use(
   helmet({
     contentSecurityPolicy: {
@@ -92,19 +92,19 @@ const store = MongoStore.create({
 });
 
 store.on("error", (err) => {
-  console.error("Session store error:", err); // ✅ catch store errors
+  console.error("Session store error:", err); 
 });
 
 app.use(
   session({
     store,
-    secret: process.env.SESSION_SECRET, // ✅ no fallback — crashes loudly if missing
+    secret: process.env.SESSION_SECRET, 
     resave: false,
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production", // ✅ HTTPS only in prod
-      sameSite: "strict",                            // ✅ CSRF protection
+      sameSite: "strict",                           
       maxAge: 1000 * 60 * 60 * 24 * 7,
     },
   })
@@ -126,7 +126,7 @@ app.use((req, res, next) => {
   res.locals.success = req.flash("success") || [];
   res.locals.error = req.flash("error") || [];
   res.locals.query = req.query?.query || "";
-  res.locals.category = req.query?.category || ""; // ✅ add this
+  res.locals.category = req.query?.category || ""; 
   next();
 });
 
@@ -147,12 +147,12 @@ app.use("/", userRoutes);
 app.use("/ai", aiRoutes);
 app.use("/search", searchRoutes);
 
-// 404
+// 
 app.use((req, res, next) => {
   next(new ExpressError(404, "Page Not Found"));
 });
 
-// ✅ ERROR HANDLER — never leak stack traces in production
+//  
 app.use((err, req, res, next) => {
   console.error("ERROR:", err.message);
   console.error(err.stack);

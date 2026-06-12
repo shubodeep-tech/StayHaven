@@ -4,7 +4,7 @@
   <div class="row justify-content-center">
     <div class="col-12 col-md-8 col-lg-6">
 
-      <h3 c-lass="mb-4 text-center">Create a New Listing</h3>
+      <h3 class="mb-4 text-center">Create a New Listing</h3>
 
       <form
         method="POST"
@@ -23,16 +23,16 @@
         </div>
 
         <!-- DESCRIPTION -->
-        <div class="mb-3" needs-validation>
+        <div class="mb-3">
           <label class="form-label">Description</label>
-          <textarea name="listing[description]" class="form-control" id="description"   novalidate required></textarea>
+          <textarea name="listing[description]" class="form-control" id="description" required></textarea>
           <div class="invalid-feedback">Description is required</div>
         </div>
 
         <!-- IMAGE -->
         <div class="mb-3">
           <label class="form-label">Upload Image</label>
-          <input type="file" name="listing[image]" class="form-control needs-validation" accept="image/*" alt="listing image" />
+          <input type="file" name="listing[image]" class="form-control" accept="image/*" />
         </div>
 
         <!-- PRICE + COUNTRY -->
@@ -69,22 +69,24 @@
           />
 
           <div class="filters-bar">
-            <div class="filter" data-category="trending"><i class="fa-solid fa-fire"></i> Trending</div>
-            <div class="filter" data-category="mountains"><i class="fa-solid fa-mountain"></i> Mountains</div>
-            <div class="filter" data-category="beaches"><i class="fa-solid fa-umbrella-beach"></i> Beaches</div>
-            <div class="filter" data-category="iconic_cities"><i class="fa-solid fa-city"></i> Cities</div>
-            <div class="filter" data-category="rooms"><i class="fa-solid fa-bed"></i> Rooms</div>
-            <div class="filter" data-category="farms"><i class="fa-solid fa-tractor"></i> Farms</div>
-            <div class="filter" data-category="camping"><i class="fa-solid fa-campground"></i> Camping</div>
-            <div class="filter" data-category="castles"><i class="fa-solid fa-chess-rook"></i> Castles</div>
-            <div class="filter" data-category="arctic"><i class="fa-solid fa-snowflake"></i> Arctic</div>
-            <div class="filter" data-category="luxury"><i class="fa-solid fa-gem"></i> Luxury</div>
-            <div class="filter" data-category="nature"><i class="fa-solid fa-tree"></i> Nature</div>
-            <div class="filter" data-category="lake"><i class="fa-solid fa-water"></i> Lake</div>
+            <div class="filter" data-category="trending"><i class="fa-solid fa-fire"></i><span>Trending</span></div>
+            <div class="filter" data-category="mountains"><i class="fa-solid fa-mountain"></i><span>Mountains</span></div>
+            <div class="filter" data-category="beaches"><i class="fa-solid fa-umbrella-beach"></i><span>Beaches</span></div>
+            <div class="filter" data-category="iconic_cities"><i class="fa-solid fa-city"></i><span>Cities</span></div>
+            <div class="filter" data-category="rooms"><i class="fa-solid fa-bed"></i><span>Rooms</span></div>
+            <div class="filter" data-category="farms"><i class="fa-solid fa-tractor"></i><span>Farms</span></div>
+            <div class="filter" data-category="camping"><i class="fa-solid fa-campground"></i><span>Camping</span></div>
+            <div class="filter" data-category="castles"><i class="fa-solid fa-chess-rook"></i><span>Castles</span></div>
+            <div class="filter" data-category="arctic"><i class="fa-solid fa-snowflake"></i><span>Arctic</span></div>
+            <div class="filter" data-category="luxury"><i class="fa-solid fa-gem"></i><span>Luxury</span></div>
+            <div class="filter" data-category="nature"><i class="fa-solid fa-tree"></i><span>Nature</span></div>
+            <div class="filter" data-category="lake"><i class="fa-solid fa-water"></i><span>Lake</span></div>
           </div>
 
-          <!-- shown/hidden by JS -->
-          
+          <div id="categoryError" class="text-danger mt-1" style="display:none;">
+            Please select a category
+          </div>
+        </div>
 
         <button type="submit" class="btn btn-dark w-100 mt-2">
           Add Listing
@@ -99,39 +101,31 @@
 document.addEventListener("DOMContentLoaded", () => {
   const filters = document.querySelectorAll(".filter");
   const categoryInput = document.getElementById("category");
+  const categoryError = document.getElementById("categoryError");
 
-
-  
   filters.forEach(f => {
     f.addEventListener("click", () => {
       filters.forEach(el => el.classList.remove("active"));
       f.classList.add("active");
       categoryInput.value = f.dataset.category;
-      
+      categoryError.style.display = "none";
       document.querySelector(".filters-bar").style.borderBottom = "2px solid #28a745";
     });
   });
 
-  
   const forms = document.querySelectorAll(".needs-validation");
-
   Array.from(forms).forEach(form => {
     form.addEventListener("submit", (e) => {
-
-      
       if (!categoryInput.value) {
-       
+        categoryError.style.display = "block";
         e.preventDefault();
         e.stopPropagation();
       }
-
-      
       if (!form.checkValidity()) {
         e.preventDefault();
         e.stopPropagation();
       }
-
-      form.classList.add("was-validated"); 
+      form.classList.add("was-validated");
     }, false);
   });
 

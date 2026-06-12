@@ -21,7 +21,7 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-const upload = multer({ storage, fileFilter }); // ✅ fileFilter added
+const upload = multer({ storage, fileFilter }); 
 
 router
   .route("/")

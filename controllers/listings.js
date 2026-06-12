@@ -1,6 +1,6 @@
 const Listing = require("../models/listing");
 const mbxGeocoding = require("@mapbox/mapbox-sdk/services/geocoding");
-const { getEmbedding } = require("../services/embedding.service"); // ✅ one source only
+const { getEmbedding } = require("../services/embedding.service");
 
 const mapToken = process.env.MAPBOX_TOKEN;
 const geocodingClient = mbxGeocoding({ accessToken: mapToken });
@@ -21,12 +21,6 @@ const renderNewForm = (req, res) => {
 // CREATE
 const createListing = async (req, res) => {
   try {
-
-    if (!req.user) {
-      req.flash("error", "Login required");
-      return res.redirect("/login");
-    }
-
     if (!req.body.listing.category) {
       req.flash("error", "Select a category");
       return res.redirect("/listings/new");
@@ -56,7 +50,7 @@ const createListing = async (req, res) => {
     const text = `${newListing.title} ${newListing.description} ${newListing.location} ${newListing.category}`;
 
     try {
-      newListing.embedding = await getEmbedding(text); // ✅ using one service
+      newListing.embedding = await getEmbedding(text);
       console.log("Embedding OK:", newListing.embedding.length);
     } catch (err) {
       console.error("Embedding failed on create:", err.message);
@@ -113,7 +107,6 @@ const updateListing = async (req, res) => {
     { new: true }
   );
 
-  // ✅ update image if a new file was uploaded
   if (req.file) {
     listing.image = {
       url: req.file.path,
@@ -124,10 +117,9 @@ const updateListing = async (req, res) => {
   const text = `${listing.title} ${listing.description} ${listing.location} ${listing.category}`;
 
   try {
-    listing.embedding = await getEmbedding(text); // ✅ using one service
+    listing.embedding = await getEmbedding(text);
   } catch (err) {
     console.error("Embedding update failed for listing:", id, err.message);
-    // ✅ keep old embedding rather than setting [] — stale is better than empty
   }
 
   await listing.save();
@@ -149,25 +141,7 @@ const searchListings = async (req, res) => {
     const searchText = req.query.query;
     if (!searchText) return res.redirect("/listings");
 
-    const queryEmbedding = await getEmbedding(searchText); // ✅ one service
-
-    let price = 100000;
-    let location = "";
-
-    const priceMatch = searchText.match(/(\d+)/);
-    if (priceMatch) price = Number(priceMatch[1]);
-
-    const words = searchText.toLowerCase().split(" ");
-    for (let word of words) {
-      if (word.length < 3) continue;
-      const exists = await Listing.findOne({
-        location: { $regex: word, $options: "i" },
-      });
-      if (exists) {
-        location = word.toLowerCase();
-        break;
-      }
-    }
+    const queryEmbedding = await getEmbedding(searchText);
 
     const results = await Listing.aggregate([
       {

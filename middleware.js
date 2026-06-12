@@ -5,7 +5,7 @@ const { listingSchema, reviewSchema } = require("./schema.js");
 
 module.exports.isLoggedIn = (req, res, next) => {
   if (!req.isAuthenticated()) {
-    req.session.redirectUrl = req.originalUrl; // ✅ save where they were going
+    req.session.redirectUrl = req.originalUrl;
     req.flash("error", "You must be logged in first!");
     return res.redirect("/login");
   }
@@ -33,8 +33,8 @@ module.exports.isOwner = async (req, res, next) => {
     return res.redirect("/login");
   }
 
-  // ✅ compare safely using toString()
-  if (listing.owner._id.toString() !== res.locals.currUser._id.toString()) {
+  // FIX: use toString() directly on owner — safe whether populated or raw ObjectId
+  if (listing.owner.toString() !== res.locals.currUser._id.toString()) {
     req.flash("error", "You don't have permission to do that!");
     return res.redirect(`/listings/${id}`);
   }
@@ -43,7 +43,6 @@ module.exports.isOwner = async (req, res, next) => {
 };
 
 module.exports.validateListing = (req, res, next) => {
-  // ✅ convert price to number before Joi validates it
   if (req.body.listing && req.body.listing.price) {
     req.body.listing.price = Number(req.body.listing.price);
   }
@@ -58,7 +57,6 @@ module.exports.validateListing = (req, res, next) => {
 };
 
 module.exports.validateReview = (req, res, next) => {
-  // ✅ convert rating to number before Joi validates it
   if (req.body.review && req.body.review.rating) {
     req.body.review.rating = Number(req.body.review.rating);
   }
@@ -81,8 +79,7 @@ module.exports.isReviewAuthor = async (req, res, next) => {
     return res.redirect(`/listings/${id}`);
   }
 
- 
-  if (review.author._id.toString() !== res.locals.currUser._id.toString()) {
+  if (review.author.toString() !== res.locals.currUser._id.toString()) {
     req.flash("error", "You don't have permission to do that!");
     return res.redirect(`/listings/${id}`);
   }
