@@ -22,6 +22,7 @@ const ExpressError = require("./utils/ExpressError");
 const User = require("./models/user");
 
 const app = express();
+app.set("trust proxy", 1);
 
 app.use(
   helmet({
