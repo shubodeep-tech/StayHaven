@@ -29,7 +29,7 @@ module.exports.signup = async (req, res,next) => {
 };
 
 module.exports.login = async (req, res) => {
-    req.flash("success", "Welcome back to StayHaven!");
+    req.flash("success", "Welcome back to Wanderlust!");
     let redirectUrl = res.locals.redirectUrl || "/listings";
     res.redirect(redirectUrl);
   
