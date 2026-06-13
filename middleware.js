@@ -33,7 +33,7 @@ module.exports.isOwner = async (req, res, next) => {
     return res.redirect("/login");
   }
 
-  // FIX: use toString() directly on owner — safe whether populated or raw ObjectId
+  // 
   if (listing.owner.toString() !== res.locals.currUser._id.toString()) {
     req.flash("error", "You don't have permission to do that!");
     return res.redirect(`/listings/${id}`);
