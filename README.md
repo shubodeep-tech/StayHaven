@@ -10,7 +10,7 @@ Preview:
 
 
 LIVE DEMO:
-https://wanderlust-98lu.onrender.com
+https://wanderlust-98lu.onrender.com/listings
 
 ## Primary Architectural Components
 
